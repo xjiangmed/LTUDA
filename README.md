@@ -61,7 +61,7 @@ python test.py --model unet_proto --reload_path './checkpoint/CDA_PDA/model_best
 TSNE feature visualization
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/tsne.png)
 ## Quantitative results
-**Toy dataset**: partially labeled images are sampled from the AbdomenCT-1K dataset.
+Toy dataset
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/toy_results.jpg)
 
 ## Citation
