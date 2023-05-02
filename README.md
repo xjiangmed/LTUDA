@@ -34,12 +34,14 @@ pip install -r requirements.txt
 ### Data preparation
 - Toy dataset: partially labeled images are sampled from [AbdomenCT-1K](https://zenodo.org/record/7860267#.ZFEMBnZBy3A).
 - Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82)
+
 Partial-label task | Data source
 --- | :---:
 Liver | [data](https://competitions.codalab.org/competitions/17094)
 Spleen | [data](http://medicaldecathlon.com/)
 Kidney | [data](https://kits19.grand-challenge.org/data/)
 Pancreas | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
+
 * Download and put these datasets in `data/Toy dataset/` and `data/PL dataset/`. 
 
 
