@@ -1,0 +1,10 @@
+/data/lx/AbdomenCT-1K/npz_case/case_0041.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0006.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0011.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0031.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0046.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0026.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0021.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0001.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0036.npz
+/data/lx/AbdomenCT-1K/npz_case/case_0016.npz
