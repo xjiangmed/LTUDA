@@ -13,13 +13,6 @@ Partially-supervised multi-organ medical image segmentation aims to learn a unif
 ## The overall architecture
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/framework.png)
 
-## Qualitative results
-TSNE feature visualization
-![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/tsne.png)
-## Quantitative results
-Partially labeled images are sampled from the **AbdomenCT-1K** dataset.
-![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/toy_results.jpg)
-
 ## Installation
 
 - Create conda environment and activate it:
@@ -29,7 +22,7 @@ conda activate ltuda
 ```
 - Clone this repo:
 ```
-git clone https://github.com/xjiang/LTUDA
+git clone https://github.com/xjiangmed/LTUDA.git
 cd LTUDA
 ```
 - Install requirements:
@@ -39,7 +32,15 @@ pip install -r requirements.txt
 
 ## Usage
 ### Data preparation
-You can download LiTS, MSD-Spleen, KiTS, NIH82 and AbdomenCT-1K from 
+- Toy dataset: partially labeled images are sampled from the AbdomenCT-1K dataset[data](https://zenodo.org/record/7860267#.ZFEMBnZBy3A).
+- Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82)
+      Partial-label task | Data source
+      --- | :---:
+      Liver | [data](https://competitions.codalab.org/competitions/17094)
+      Spleen | [data](http://medicaldecathlon.com/)
+      Kidney | [data](https://kits19.grand-challenge.org/data/)
+      Pancreas | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
+* Download and put these datasets in `data/Toy dataset/` and `data/PL dataset/`. 
 
 
 ### Train 
@@ -59,6 +60,13 @@ python train3d.py --dataroot ./octa-500/OCT2OCTA3M_3D --name transpro_3M --model
 ```
 python test3d.py --dataroot ./octa-500/OCT2OCTA3M_3D --name transpro_3M --test_name transpro_3M --model TransPro --netG unet_256 --direction AtoB --lambda_A 10 --lambda_C 5 --dataset_mode alignedoct2octa3d --norm batch --input_nc 1 --output_nc 1 --gpu_ids 0 --num_test 15200 --which_epoch 164 --load_iter 164
 ```
+
+## Qualitative results
+TSNE feature visualization
+![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/tsne.png)
+## Quantitative results
+**Toy dataset**: partially labeled images are sampled from the AbdomenCT-1K dataset.
+![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/toy_results.jpg)
 
 ## Citation
 If our paper is useful for your research, please cite:

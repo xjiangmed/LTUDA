@@ -1,13 +1,5 @@
 import numpy as np
-from PIL import Image, ImageOps, ImageFilter
-import random
 import torch
-from torchvision import transforms
-from scipy import ndimage
-from scipy.ndimage.filters import gaussian_filter
-from scipy.special import erfinv
-import torch.nn.functional as F
-from skimage import measure
 
 def obtain_cutmix_box(img_size, size_min=0.02, size_max=0.4, ratio_1=0.3, ratio_2=1/0.3):
     mask = torch.ones(img_size, img_size)
