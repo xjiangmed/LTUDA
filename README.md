@@ -12,10 +12,14 @@ Partially-supervised multi-organ medical image segmentation aims to learn a unif
 
 ## The overall architecture
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/framework.png)
-## Qualitative results
-![image](https://github.com/xjiang/LTUDA/blob/main/imgs/figure3.png)
-## Quantitative results
-![image](https://github.com/xjiang/LTUDA/blob/main/imgs/result.png)
+
+## Results
+
+### Toy dataset
+
+![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/framework.png)
+
+### Partially labeled dataset
 
 ## Installation
 
