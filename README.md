@@ -35,32 +35,26 @@ pip install -r requirements.txt
 - Toy dataset: partially labeled images are sampled from [AbdomenCT-1K](https://zenodo.org/record/7860267#.ZFEMBnZBy3A).
 - Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82)
 
-Partial-label task | Data source
+Dataset | source
 --- | :---:
-Liver | [data](https://competitions.codalab.org/competitions/17094)
-Spleen | [data](http://medicaldecathlon.com/)
-Kidney | [data](https://kits19.grand-challenge.org/data/)
-Pancreas | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
-
-* Download and put these datasets in `data/Toy dataset/` and `data/PL dataset/`. 
-
+LiTS | [data](https://competitions.codalab.org/competitions/17094)
+MSD-Spleen | [data](http://medicaldecathlon.com/)
+KiTS | [data](https://kits19.grand-challenge.org/data/)
+NIH82 | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
 
 ### Train 
-- To view training results and loss plots, please run:
+- Stage1: cross-set data augmentation:
 ```
-python -m visdom.server -p 6031
+python train_CDA.py --save_model_path ./checkpoint/CDA --model unet 
 ```
-and click the URL http://localhost:6031
-
-- To train the model, please run:
+- Stage2: prototype-based distribution alignment
 ```
-python train3d.py --dataroot ./octa-500/OCT2OCTA3M_3D --name transpro_3M --model TransPro --netG unet_256 --direction AtoB --lambda_A 10 --lambda_C 5 --dataset_mode alignedoct2octa3d --norm batch --pool_size 0 --load_size 304 --input_nc 1 --output_nc 1 --display_port 6031 --gpu_ids 0 --no_flip
+python train_CDA_PDA.py --save_model_path ./checkpoint/CDA_PDA --model unet_proto --reload_path './checkpoint/CDA/model_best.pth' 
 ```
-
 ### Test
 - To test the model, please run:
 ```
-python test3d.py --dataroot ./octa-500/OCT2OCTA3M_3D --name transpro_3M --test_name transpro_3M --model TransPro --netG unet_256 --direction AtoB --lambda_A 10 --lambda_C 5 --dataset_mode alignedoct2octa3d --norm batch --input_nc 1 --output_nc 1 --gpu_ids 0 --num_test 15200 --which_epoch 164 --load_iter 164
+python test.py --model unet_proto --reload_path './checkpoint/CDA_PDA/model_best.pth'
 ```
 
 ## Qualitative results
@@ -73,13 +67,15 @@ TSNE feature visualization
 ## Citation
 If our paper is useful for your research, please cite:
 ```
-@article{li2023vesselpromoted,
-      title={Vessel-Promoted OCT to OCTA Image Translation by Heuristic Contextual Constraints}, 
-      author={Shuhan Li and Dong Zhang and Xiaomeng Li and Chubin Ou and Lin An and Yanwu Xu and Kwang-Ting Cheng},
+@article{ ,
+      title={Labeled-to-Unlabeled Distribution Alignment for Partially-Supervised Multi-Organ Medical Image Segmentation}, 
+      author={Xixi Jiang and Dong Zhang and Xiang Li and Kangyi Liu and Kwang-Ting Cheng and Xin Yang},
       journal={arXiv},
       year={2023}
 }
 ```
 
 ## Implementation reference
-[CycleGAN and pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
+[ProtoSeg](https://github.com/tfzhou/ProtoSeg)
+[DoDNet](https://github.com/jianpengz/DoDNet)
+[FixMatch_pytorch](https://github.com/valencebond/FixMatch_pytorch)
