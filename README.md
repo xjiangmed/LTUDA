@@ -76,6 +76,6 @@ If our paper is useful for your research, please cite:
 ```
 
 ## Implementation reference
-[ProtoSeg](https://github.com/tfzhou/ProtoSeg)
-[DoDNet](https://github.com/jianpengz/DoDNet)
-[FixMatch_pytorch](https://github.com/valencebond/FixMatch_pytorch)
+- [ProtoSeg](https://github.com/tfzhou/ProtoSeg)
+- [DoDNet](https://github.com/jianpengz/DoDNet)
+- [FixMatch_pytorch](https://github.com/valencebond/FixMatch_pytorch)
