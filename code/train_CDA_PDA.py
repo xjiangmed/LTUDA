@@ -165,7 +165,7 @@ def main():
                 print('dice_ema:'+str(val_dice_ema)+' L '+str(dice_organs_ema[0])+' S '+str(dice_organs_ema[1])+' K '+str(dice_organs_ema[2])+' P'+str(dice_organs_ema[3]))
 
                 if val_dice_ema > max_dice_ema:
-                    torch.save(teacher_model.state_dict(),osp.join(args.save_model_path, 'model_best_ema.pth'))
+                    torch.save(teacher_model.state_dict(),osp.join(args.save_model_path, 'ema_model_best.pth'))
                     max_dice_ema = val_dice_ema
                     print("=> saved best teacher_model")
                 print("best val dice_ema:{0}".format(max_dice_ema))
