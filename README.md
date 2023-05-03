@@ -33,8 +33,9 @@ pip install -r requirements.txt
 ## Usage
 ### Data preparation
 - Toy dataset: partially labeled images are sampled from AbdomenCT-1K.
-- Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82)
-      We evaluate the performance of the multi-organ segmentation model trained on partially labeled data on two external datasets, BTCV and AbdomenCT-1K.
+- Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82).
+We evaluate the performance of the multi-organ segmentation model trained on partially labeled data on two external datasets, BTCV and AbdomenCT-1K.
+
 Dataset | source
 --- | :---:
 LiTS | [data](https://competitions.codalab.org/competitions/17094)
