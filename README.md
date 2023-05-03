@@ -46,7 +46,7 @@ BTCV  | [data](https://www.synapse.org/#!Synapse:syn3193805/wiki/217753)
 AbdomenCT-1K | [data](https://zenodo.org/record/7860267#.ZFEMBnZBy3A)
 - For data preprocessing, the 3D CT volume is first sliced along the z-axis direction, and irrelevant non-abdominal regions are removed, and finally the axial slice is adjusted to a size of 256×256 pixels.
 - A preprocessed toy dataset can be downloaded from the [link](https://drive.google.com/file/d/1d9Y6zJoYXG8Anzug3oeERYLK-4mu69XN/view?usp=sharing). 
-- Partially labeled datasets can be processed using the same steps, we do not provide the processed images due to large data size. 
+- Partially labeled datasets can be processed using the same steps, we do not provide the processed images due to large data size. Here, we do not consider the segmentation of the tumor region, so the tumor in the LiTS dataset is treated as liver, and the tumor in the KiTS dataset is treated as the background. This treatment is based on the consideration that the tumors in the liver are all inside, while the tumors in the kidney have largely destroyed the integrity and continuity of the entire organ.
 
 ### Train 
 - Stage1: cross-set data augmentation:
