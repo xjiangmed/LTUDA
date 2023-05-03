@@ -70,7 +70,7 @@ python test.py --model unet_proto --reload_path './checkpoint/CDA_PDA/ema_model_
 TSNE feature visualization
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/tsne.png)
 ## Quantitative results
-Toy dataset
+Quantitative results on the toy dataset
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/toy_results.jpg)
 
 ## Citation
