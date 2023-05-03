@@ -34,7 +34,7 @@ pip install -r requirements.txt
 ### Data preparation
 - Toy dataset: partially labeled images are sampled from AbdomenCT-1K.
 - Partially labeled dataset: a union of four benchmark datasets (LiTS, MSD-Spleen, KiTS and NIH82).
-We evaluate the performance of the multi-organ segmentation model trained on partially labeled data on two external datasets, BTCV and AbdomenCT-1K.
+We evaluate the performance of the multi-organ segmentation model trained on partially labeled dataset on two external datasets, BTCV and AbdomenCT-1K.
 
 Dataset | source
 --- | :---:
@@ -45,7 +45,8 @@ NIH82 | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
 BTCV  | [data](https://www.synapse.org/#!Synapse:syn3193805/wiki/217753)
 AbdomenCT-1K | [data](https://zenodo.org/record/7860267#.ZFEMBnZBy3A)
 - For data preprocessing, the 3D CT volume is first sliced along the z-axis direction, and irrelevant non-abdominal regions are removed, and finally the axial slice is adjusted to a size of 256×256 pixels.
-- A preprocessed toy dataset can be downloaded from the [link](https://drive.google.com/file/d/1d9Y6zJoYXG8Anzug3oeERYLK-4mu69XN/view?usp=sharing). Partially labeled datasets can be processed using the same steps, we do not provide all processed images due to large data size.
+- A preprocessed toy dataset can be downloaded from the [link](https://drive.google.com/file/d/1d9Y6zJoYXG8Anzug3oeERYLK-4mu69XN/view?usp=sharing). 
+- Partially labeled datasets can be processed using the same steps, we do not provide the processed images due to large data size. 
 
 ### Train 
 - Stage1: cross-set data augmentation:
@@ -56,7 +57,9 @@ python train_CDA.py --save_model_path ./checkpoint/CDA --model unet
 ```
 python train_CDA_PDA.py --save_model_path ./checkpoint/CDA_PDA --model unet_proto --reload_path './checkpoint/CDA/model_best.pth' 
 ```
-The trained models are available [here](https://drive.google.com/drive/folders/18kOTBn-VOrO8D28ePdMbUaV1nFJfW6C5?usp=sharing).
+The models trained on toy dataset are available [here](https://drive.google.com/drive/folders/18kOTBn-VOrO8D28ePdMbUaV1nFJfW6C5?usp=sharing).
+The models trained on Partially labeled dataset are available [here]().
+
 ### Test
 - To test the model, please run:
 ```
