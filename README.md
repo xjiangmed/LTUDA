@@ -42,6 +42,8 @@ MSD-Spleen | [data](http://medicaldecathlon.com/)
 KiTS | [data](https://kits19.grand-challenge.org/data/)
 NIH82 | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
 
+- A preprocessed toy dataset can be downloaded from the [link](https://drive.google.com/file/d/1d9Y6zJoYXG8Anzug3oeERYLK-4mu69XN/view?usp=sharing). Partially labeled datasets can be processed using the same steps, we do not provide all processed images due to large data size.
+
 ### Train 
 - Stage1: cross-set data augmentation:
 ```
