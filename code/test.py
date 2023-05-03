@@ -9,10 +9,7 @@ import SimpleITK as sitk
 from skimage.measure import label as LAB
 from utils.util import truncate,read_lists
 
-post=True
-linear_classifier=True
-lp_classifier=False
-ulp_classifier=False
+
 data_size = [1, 256, 256]
 
 def continues_region_extract_organ(label, keep_region_nums):  
@@ -66,15 +63,15 @@ def test():
             data_batch[0, 0, :, :] = truncate(data[j, :, :].copy())
             data_bat = torch.from_numpy(data_batch).cuda().float()
             
-            if linear_classifier:
+            if args.linear_classifier:
                 outputs = net(data_bat)
                 out = get_prediction(outputs) 
-            elif lp_classifier:
+            elif args.lp_classifier:
                 outputs = net(data_bat, linear_classifier=False, lp_classifier=True)
                 compact_pred = torch.argmax(outputs, dim=1)
                 compact_pred = compact_pred.data.cpu().numpy()
                 out = compact_pred[0,:,:].copy()
-            elif ulp_classifier:
+            elif args.ulp_classifier:
                 outputs = net(data_bat, linear_classifier=False, ulp_classifier=True)
                 compact_pred = torch.argmax(outputs, dim=1)
                 compact_pred = compact_pred.data.cpu().numpy()
@@ -83,7 +80,7 @@ def test():
             tmp_pred[j,:,:] = out.copy()
 
         #post
-        if post:
+        if args.post:
             pred_liver = (tmp_pred == 1)
             pred_spleen = (tmp_pred == 2)
             pred_kidney = (tmp_pred == 3)
