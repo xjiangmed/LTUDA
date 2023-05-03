@@ -53,7 +53,7 @@ python train_CDA.py --save_model_path ./checkpoint/CDA --model unet
 ```
 python train_CDA_PDA.py --save_model_path ./checkpoint/CDA_PDA --model unet_proto --reload_path './checkpoint/CDA/model_best.pth' 
 ```
-The trained models are available [here](https://drive.google.com/file/d/1VGuOUGPaOqMD-uB7In9-RiIstJjnYORc/view?usp=sharing).
+The trained models are available [here](https://drive.google.com/drive/folders/18kOTBn-VOrO8D28ePdMbUaV1nFJfW6C5?usp=sharing).
 ### Test
 - To test the model, please run:
 ```
