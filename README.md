@@ -41,7 +41,7 @@ LiTS | [data](https://competitions.codalab.org/competitions/17094)
 MSD-Spleen | [data](http://medicaldecathlon.com/)
 KiTS | [data](https://kits19.grand-challenge.org/data/)
 NIH82 | [data](https://wiki.cancerimagingarchive.net/display/Public/Pancreas-CT)
-BTCV  | [data](https://www.synapse.org/#!Synapse:syn3193805/files/)
+BTCV  | [data](https://www.synapse.org/#!Synapse:syn3193805/wiki/217753)
 AbdomenCT-1K | [data](https://zenodo.org/record/7860267#.ZFEMBnZBy3A)
 - For data preprocessing, the 3D CT volume is first sliced along the z-axis direction, and irrelevant non-abdominal regions are removed, and finally the axial slice is adjusted to a size of 256×256 pixels.
 - A preprocessed toy dataset can be downloaded from the [link](https://drive.google.com/file/d/1d9Y6zJoYXG8Anzug3oeERYLK-4mu69XN/view?usp=sharing). Partially labeled datasets can be processed using the same steps, we do not provide all processed images due to large data size.
