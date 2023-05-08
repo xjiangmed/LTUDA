@@ -51,19 +51,19 @@ AbdomenCT-1K | [data](https://zenodo.org/record/7860267#.ZFEMBnZBy3A)
 ### Train 
 - Stage1: cross-set data augmentation:
 ```
-python train_CDA.py --save_model_path ./checkpoint/CDA --model unet 
+python train_CDA.py --save_model_path ../checkpoint/CDA --model unet 
 ```
 - Stage2: prototype-based distribution alignment
 ```
-python train_CDA_PDA.py --save_model_path ./checkpoint/CDA_PDA --model unet_proto --reload_path './checkpoint/CDA/model_best.pth' 
+python train_CDA_PDA.py --save_model_path ../checkpoint/CDA_PDA --model unet_proto --reload_path '../checkpoint/CDA/model_best.pth' 
 ```
-The models trained on toy dataset are available [here](https://drive.google.com/drive/folders/18kOTBn-VOrO8D28ePdMbUaV1nFJfW6C5?usp=sharing).
-The models trained on Partially labeled dataset are available [here]().
+The models trained on toy dataset are available [here](https://drive.google.com/file/d/1YGoWS8bFAUYmxjP9cRjMq8C37C0npuyA/view?usp=sharing).
+The models trained on Partially labeled dataset are available [here](https://drive.google.com/file/d/1nsz5GEJtkwcw0FYw8x7NpmL2KX-D2-5l/view?usp=sharing).
 
 ### Test
 - To test the model, please run:
 ```
-python test.py --model unet_proto --reload_path './checkpoint/CDA_PDA/ema_model_best.pth'
+python test.py --model unet_proto --reload_path '../checkpoint/CDA_PDA/ema_model_best.pth'
 ```
 
 ## Qualitative results
