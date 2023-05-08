@@ -2,7 +2,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 import torch
 import numpy as np
-from unet_parts import *
+from networks.unet_parts import *
 from timm.models.layers import trunc_normal_
 from einops import rearrange, repeat
 import torch.distributed as dist
@@ -222,8 +222,8 @@ class unet_proto(nn.Module):
                     return out_seg_unlabeled
             
         if use_prototype is True and gt_seg is not None and pseudo_seg is not None and lp_classifier is True and ulp_classifier is True:
-            gt_seg = F.interpolate(gt_seg.unsqueeze(1).float(), size=feats.size()[2:], mode='nearest').view(-1)
-            pseudo_seg = F.interpolate(pseudo_seg.unsqueeze(1).float(), size=feats.size()[2:], mode='nearest').view(-1)
+            gt_seg = F.interpolate(gt_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
+            pseudo_seg = F.interpolate(pseudo_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
             contrast_logits_labeled, contrast_target_labeled = self.prototype_learning(_c, out_seg_labeled, gt_seg, masks_labeled, labeled=True)
             contrast_logits_unlabeled, contrast_target_unlabeled = self.prototype_learning(_c, out_seg_unlabeled, pseudo_seg, masks_unlabeled,labeled=False)
             return (logits, out_seg_labeled, out_seg_unlabeled), (contrast_logits_labeled, contrast_logits_unlabeled), \
