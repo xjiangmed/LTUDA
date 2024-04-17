@@ -60,6 +60,7 @@ python train_CDA_PDA.py --save_model_path ../checkpoint/CDA_PDA --model unet_pro
 The models trained on toy dataset are available [here](https://drive.google.com/file/d/1YGoWS8bFAUYmxjP9cRjMq8C37C0npuyA/view?usp=sharing).
 The models trained on Partially labeled dataset are available [here](https://drive.google.com/file/d/1nsz5GEJtkwcw0FYw8x7NpmL2KX-D2-5l/view?usp=sharing).
 
+
 ### Test
 - To test the model, please run:
 ```
