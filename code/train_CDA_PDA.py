@@ -218,10 +218,9 @@ def main():
         if epoch >= 0:
             test_model.eval()
             model_ema.eval()
-            dice_val = []
             with torch.no_grad():
                 print('epoch:'+str(epoch))
-                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(test_model, args.val_path_multi_AbdomenCT_1K,test_linear=False)
+                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(test_model, args.val_path,test_linear=False)
                 print('1K----student model prototype:'+str(dice_final_AbdomenCT_1K)+' L '+str(dice_organs_1K[0])+' S '+str(dice_organs_1K[1])+' K '+str(dice_organs_1K[2])+' P '+str(dice_organs_1K[3]))
                 writer.add_scalars('evaluation_dice_final', {'multi_AbdomenCT_1K':dice_final_AbdomenCT_1K}, epoch)
             
@@ -232,7 +231,7 @@ def main():
                     print("=> saved model")
 
 
-                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(model_ema, args.val_path_multi_AbdomenCT_1K,test_linear=False)
+                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(model_ema, args.val_path,test_linear=False)
                 print('1K----ema model:'+str(dice_final_AbdomenCT_1K)+' L '+str(dice_organs_1K[0])+' S '+str(dice_organs_1K[1])+' K '+str(dice_organs_1K[2])+' P '+str(dice_organs_1K[3]))
                 writer.add_scalars('evaluation_dice_ema', {'multi_AbdomenCT_1K':dice_final_AbdomenCT_1K}, epoch)
 
