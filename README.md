@@ -74,7 +74,7 @@ TSNE feature visualization
 Quantitative results on the toy dataset
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/toy_results.jpg)
 
-## Citation
+<!-- ## Citation
 If our paper is useful for your research, please cite:
 ```
 @article{ ,
@@ -83,7 +83,7 @@ If our paper is useful for your research, please cite:
       journal={arXiv},
       year={2023}
 }
-```
+``` -->
 
 ## Implementation reference
 - [ProtoSeg](https://github.com/tfzhou/ProtoSeg)
