@@ -1,8 +1,15 @@
+# -*- coding:UTF-8 -*-
 import torch.nn as nn
 from torch.nn import functional as F
+import math
+import torch.utils.model_zoo as model_zoo
 import torch
 import numpy as np
+from torch.autograd import Variable
+affine_par = True
+import functools
 from networks.unet_parts import *
+import sys, os
 from timm.models.layers import trunc_normal_
 from einops import rearrange, repeat
 import torch.distributed as dist
@@ -61,13 +68,6 @@ class ProjectionHead(nn.Module):
     def forward(self, x):
         return F.normalize(self.proj(x), p=2, dim=1)
 
-def get_prediction(outputs, thresh=0.5):
-    probability_, max_ = torch.max(F.sigmoid(outputs), dim=1)
-    max_ = max_+1 
-    pred_seg = torch.where(probability_<thresh, torch.as_tensor(0).cuda(), max_)
-    return pred_seg
-
-
 
 class unet_proto(nn.Module):
     def __init__(self, n_channels, n_classes, num_prototype=1):
@@ -87,7 +87,8 @@ class unet_proto(nn.Module):
         self.gamma = 0.999,
         self.num_prototype = num_prototype 
         self.update_prototype = True
-        self.num_classes = n_classes+1
+        self.pretrain_prototype = False
+        self.num_classes = 5
 
         in_channels = 64
         self.prototypes_labeled = nn.Parameter(torch.zeros(self.num_classes, self.num_prototype, in_channels),
@@ -175,25 +176,25 @@ class unet_proto(nn.Module):
 
 
         return proto_logits, proto_target
-    def forward(self, x, gt_seg=None, pseudo_seg=None, use_prototype=False, linear_classifier=True, lp_classifier=False, ulp_classifier=False):
 
+    def forward(self, x, gt_seg=None, pseudo_seg=None, pretrain_prototype=False, use_prototype=False, test_linear=False, test_proto=False):
         x1 = self.inc(x)
         x2 = self.down1(x1)
         x3 = self.down2(x2)
         x4 = self.down3(x3)
         x_select = self.down4(x4)
+
         x = self.up1(x_select, x4)
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x_out = self.up4(x, x1) 
 
-        if linear_classifier:
+        if test_linear:
             logits = self.outc(x_out)
-            if not use_prototype:
-                return logits
+            c = self.proj_head(x_out)
+            return logits, c
 
-        if lp_classifier or ulp_classifier: #prototype classifier
-
+        if test_proto:
             feats = x_out
 
             c = self.proj_head(feats)#use prototype for seg
@@ -201,41 +202,63 @@ class unet_proto(nn.Module):
             _c = self.feat_norm(_c)
             _c = l2_normalize(_c)
 
-            if lp_classifier:
+            # test unlabeled proto
+            self.prototypes_unlabeled.data.copy_(l2_normalize(self.prototypes_unlabeled))
 
-                self.prototypes_labeled.data.copy_(l2_normalize(self.prototypes_labeled))
-                # n: h*w, k: num_class, m: num_prototype
-                masks_labeled = torch.einsum('nd,kmd->nmk', _c, self.prototypes_labeled)
-                out_seg_labeled = torch.amax(masks_labeled, dim=1)
-                out_seg_labeled = self.mask_norm(out_seg_labeled)
-                out_seg_labeled = rearrange(out_seg_labeled, "(b h w) k -> b k h w", b=feats.shape[0], h=feats.shape[2]) #(4,5,256,256)
-                if not use_prototype:
-                    return out_seg_labeled
+            # n: h*w, k: num_class, m: num_prototype
+            masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_unlabeled)
 
-            if ulp_classifier:
-                self.prototypes_unlabeled.data.copy_(l2_normalize(self.prototypes_unlabeled))
-                masks_unlabeled = torch.einsum('nd,kmd->nmk', _c, self.prototypes_unlabeled)
-                out_seg_unlabeled = torch.amax(masks_unlabeled, dim=1)
-                out_seg_unlabeled = self.mask_norm(out_seg_unlabeled)
-                out_seg_unlabeled = rearrange(out_seg_unlabeled, "(b h w) k -> b k h w", b=feats.shape[0], h=feats.shape[2]) #(4,5,256,256)
-                if not use_prototype:
-                    return out_seg_unlabeled
-            
-        if use_prototype is True and gt_seg is not None and pseudo_seg is not None and lp_classifier is True and ulp_classifier is True:
-            gt_seg = F.interpolate(gt_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
-            pseudo_seg = F.interpolate(pseudo_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
-            contrast_logits_labeled, contrast_target_labeled = self.prototype_learning(_c, out_seg_labeled, gt_seg, masks_labeled, labeled=True)
-            contrast_logits_unlabeled, contrast_target_unlabeled = self.prototype_learning(_c, out_seg_unlabeled, pseudo_seg, masks_unlabeled,labeled=False)
-            return (logits, out_seg_labeled, out_seg_unlabeled), (contrast_logits_labeled, contrast_logits_unlabeled), \
-                (contrast_target_labeled, contrast_target_unlabeled)
+            # # # test labeled proto
+            # self.prototypes_labeled.data.copy_(l2_normalize(self.prototypes_labeled))
+
+            # # n: h*w, k: num_class, m: num_prototype
+            # masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_labeled)
+
+            out_seg = torch.amax(masks, dim=1)
+            out_seg = self.mask_norm(out_seg)
+            out_seg = rearrange(out_seg, "(b h w) k -> b k h w", b=feats.shape[0], h=feats.shape[2]) 
+            return out_seg, c
+
         
+        
+        if not use_prototype:
+            logits = self.outc(x_out)
+            return logits, x_out
+        else:
+            feats = x_out
+
+            c = self.proj_head(feats)#use prototype for seg
+            _c = rearrange(c, 'b c h w -> (b h w) c')
+            _c = self.feat_norm(_c)
+            _c = l2_normalize(_c)
+
+            self.prototypes_labeled.data.copy_(l2_normalize(self.prototypes_labeled))
+            self.prototypes_unlabeled.data.copy_(l2_normalize(self.prototypes_unlabeled))
+
+            # n: h*w, k: num_class, m: num_prototype
+            masks_labeled = torch.einsum('nd,kmd->nmk', _c, self.prototypes_labeled)
+            out_seg_labeled = torch.amax(masks_labeled, dim=1)
+            out_seg_labeled = self.mask_norm(out_seg_labeled)
+            out_seg_labeled = rearrange(out_seg_labeled, "(b h w) k -> b k h w", b=feats.shape[0], h=feats.shape[2]) #(4,5,256,256)
+
+            masks_unlabeled = torch.einsum('nd,kmd->nmk', _c, self.prototypes_unlabeled)
+            out_seg_unlabeled = torch.amax(masks_unlabeled, dim=1)
+            out_seg_unlabeled = self.mask_norm(out_seg_unlabeled)
+            out_seg_unlabeled = rearrange(out_seg_unlabeled, "(b h w) k -> b k h w", b=feats.shape[0], h=feats.shape[2]) #(4,5,256,256)
+            
+            #use pseduo_seg to replace gt_seg
+            if pretrain_prototype is False and use_prototype is True and gt_seg is not None:
+                gt_seg = F.interpolate(gt_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
+                pseudo_seg = F.interpolate(pseudo_seg.float(), size=feats.size()[2:], mode='nearest').view(-1)
+                contrast_logits_labeled, contrast_target_labeled = self.prototype_learning(_c, out_seg_labeled, gt_seg, masks_labeled, labeled=True)
+                contrast_logits_unlabeled, contrast_target_unlabeled = self.prototype_learning(_c, out_seg_unlabeled, pseudo_seg, masks_unlabeled,labeled=False)
+                return out_seg_labeled, contrast_logits_labeled, contrast_target_labeled, out_seg_unlabeled, contrast_logits_unlabeled, contrast_target_unlabeled
+
+
+
 def UNet_proto(input_channel = 1,num_class = 1,num_prototype=1):
     print("Using Unet")
     model = unet_proto(input_channel,num_class,num_prototype)
     return model
 
-
-
-        
-        
 

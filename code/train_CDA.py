@@ -70,8 +70,7 @@ def main():
             images_w, labels_w, partial_labels_w = aug_images[0].type(torch.FloatTensor).cuda(), aug_labels[0].type(torch.FloatTensor).cuda(), aug_partial_labels[0].type(torch.FloatTensor).cuda()
             images_s1, labels_s1, partial_labels_s1 = aug_images[1].type(torch.FloatTensor).cuda(), aug_labels[1].type(torch.FloatTensor).cuda(), aug_partial_labels[1].type(torch.FloatTensor).cuda()
             images_s2, labels_s2, partial_labels_s2 = aug_images[2].type(torch.FloatTensor).cuda(), aug_labels[2].type(torch.FloatTensor).cuda(), aug_partial_labels[2].type(torch.FloatTensor).cuda()
-            MixMask1 = MixMasks[0,:]
-            MixMask2 = MixMasks[1,:]
+            MixMask1, MixMask2 = MixMasks
 
             # get pseudo labels from teacher_model for unlabeled data
             outputs_t = teacher_model(images_w)
