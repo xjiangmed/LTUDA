@@ -211,12 +211,11 @@ def main():
         end = timeit.default_timer()
         print(end - start, 'seconds')
         all_tr_loss.append(epoch_loss)
-        if (args.local_rank == 0):
-            print('Epoch_sum {}: lr = {:.4}, loss_Sum = {:.4}'.format(epoch, optimizer1.param_groups[0]['lr'], epoch_loss.item()))
-            writer.add_scalar('learning_rate', optimizer1.param_groups[0]['lr'], epoch)
-            writer.add_scalars('loss',{'model1':epoch_model1_loss.item(), 'model2': epoch_model2_loss.item()}, epoch)
+        print('Epoch_sum {}: lr = {:.4}, loss_Sum = {:.4}'.format(epoch, optimizer1.param_groups[0]['lr'], epoch_loss.item()))
+        writer.add_scalar('learning_rate', optimizer1.param_groups[0]['lr'], epoch)
+        writer.add_scalars('loss',{'model1':epoch_model1_loss.item(), 'model2': epoch_model2_loss.item()}, epoch)
             
-        if (epoch >= 0) and (args.local_rank == 0):
+        if epoch >= 0:
             test_model.eval()
             model_ema.eval()
             dice_val = []
