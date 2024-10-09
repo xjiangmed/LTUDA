@@ -8,12 +8,12 @@ from torch.utils import data
 from utils.transform import obtain_cutmix_box, mix
 
 class ToyDataSet(data.Dataset):
-    def __init__(self, list_path, return_index=False, aug=True):
+    def __init__(self, list_path, data_dir, return_index=False, aug=True):
         self.list_path = list_path
         self.aug = aug
         with open(self.list_path, 'r') as fp:
             rows = fp.readlines()
-        self.img_ids = [row[:-1] for row in rows]
+        self.img_ids = [os.path.join(data_dir, row[:-1]) for row in rows]
         self.files = []
         self.return_index = return_index
 

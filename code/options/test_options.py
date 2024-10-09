@@ -3,10 +3,11 @@ import argparse
 class TestOptions():
     def initialize(self):
         parser = argparse.ArgumentParser(description="test segmentation network")
-        parser.add_argument('--model', type=str, default='unet', help='model_name')
+        parser.add_argument('--model', type=str, default='unet_proto', help='model_name')
         parser.add_argument("--reload_path", type=str, default='../checkpoint/CDA_PDA/ema_model_best.pth')
         parser.add_argument("--result_path", type=str, default='../results/CDA_PDA/')
-        parser.add_argument("--test_path", type=str, default="../data/Toy dataset/test_volume.txt")
+        parser.add_argument("--data_dir", type=str, default="../data/Toy_dataset/AbdomenCT-1K/npz_case/")
+        parser.add_argument("--test_path", type=str, default="../data/Toy_dataset/test_volume.txt")
         parser.add_argument("--linear_classifier", type=bool, default=False)
         parser.add_argument("--lp_classifier", type=bool, default=False)
         parser.add_argument("--ulp_classifier", type=bool, default=True)

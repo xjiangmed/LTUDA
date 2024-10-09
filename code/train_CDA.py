@@ -45,7 +45,7 @@ def main():
     optimizer = torch.optim.SGD(student_model.parameters(), args.learning_rate, momentum=0.99, nesterov=True)
 
     # Define the dataset
-    train_data = ToyDataSet(args.train_path)
+    train_data = ToyDataSet(args.train_path, args.train_data_dir)
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
 
     loss_pBCE = loss.pBCE(num_classes=4).to(device)
@@ -136,7 +136,7 @@ def main():
             student_model.eval()
             teacher_model.eval()
             with torch.no_grad():
-                val_dice, dice_organs = evaluation(student_model, args.val_path)
+                val_dice, dice_organs = evaluation(student_model, args.val_path, args.val_data_dir)
                 print('epoch:'+str(epoch))
                 print('dice:'+str(val_dice)+' L '+str(dice_organs[0])+' S '+str(dice_organs[1])+' K '+str(dice_organs[2])+' P'+str(dice_organs[3]))
 
@@ -146,7 +146,7 @@ def main():
                     print("=> saved best student_model")
                 print("best val dice:{0}".format(max_dice))
 
-                val_dice_ema, dice_organs_ema = evaluation(teacher_model, args.val_path)
+                val_dice_ema, dice_organs_ema = evaluation(teacher_model, args.val_path, args.val_data_dir)
                 print('epoch:'+str(epoch))
                 print('dice_ema:'+str(val_dice_ema)+' L '+str(dice_organs_ema[0])+' S '+str(dice_organs_ema[1])+' K '+str(dice_organs_ema[2])+' P'+str(dice_organs_ema[3]))
 
@@ -156,11 +156,12 @@ def main():
                     print("=> saved best teacher_model")
                 print("best val dice_ema:{0}".format(max_dice_ema))
 
-def evaluation(model, data_path):
+def evaluation(model, data_path, data_dir):
     test_list = read_lists(data_path)
     dice_list={'L':[],'S':[],'K':[],'P':[]}
     for _, fid in enumerate(test_list):
-        _npz_dict = np.load(fid)
+        file_path = os.path.join(data_dir, fid)
+        _npz_dict = np.load(file_path)
         data = _npz_dict['arr_0'].transpose(2,1,0)
         label = _npz_dict['arr_1'].transpose(2,1,0)
         tmp_pred = np.zeros(label.shape)

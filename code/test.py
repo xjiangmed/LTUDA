@@ -40,39 +40,45 @@ def test():
     opt = TestOptions()
     args = opt.initialize()
     
-    net = net_factory(net_type=args.model) #'unet_proto'
+    net = net_factory(net_type=args.model) 
     net.load_state_dict(torch.load(args.reload_path))
+    print('load model')
     net.eval()
     net.cuda()
     
     test_list = read_lists(args.test_path)
     
     if not os.path.exists(args.result_path):
-        os.mkdir(args.result_path)
+        os.makedirs(args.result_path)
     
     dice_list = {'L':[],'S':[],'K':[],'P':[]}
     hd_list = {'L':[],'S':[],'K':[],'P':[]}
     for idx_file, fid in enumerate(test_list):
-        dataid = fid.split('/')[-1].split('.')[0].split('_')[1]
-        _npz_dict = np.load(fid)
+        print('processing :', fid)
+        dataid = fid.split('.')[0].split('_')[1]
+        file_path = os.path.join(args.data_dir, fid)
+        print('file_path:', file_path)
+        _npz_dict = np.load(file_path)
         data = _npz_dict['arr_0'].transpose(2,1,0)
         label = _npz_dict['arr_1'].transpose(2,1,0)
         tmp_pred = np.zeros(label.shape)
+        print('label.shape:', label.shape)
         for j in range(0,label.shape[0]):
+            print('j:', j)
             data_batch = np.zeros([1, data_size[0], data_size[1], data_size[2]])
             data_batch[0, 0, :, :] = truncate(data[j, :, :].copy())
             data_bat = torch.from_numpy(data_batch).cuda().float()
             
             if args.linear_classifier:
-                outputs = net(data_bat)
+                outputs, _ = net(data_bat, test_linear=True, test_lproto=False, test_ulproto=False)
                 out = get_prediction(outputs) 
             elif args.lp_classifier:
-                outputs = net(data_bat, linear_classifier=False, lp_classifier=True)
+                outputs, _ = net(data_bat, test_linear=False, test_lproto=True, test_ulproto=False)
                 compact_pred = torch.argmax(outputs, dim=1)
                 compact_pred = compact_pred.data.cpu().numpy()
                 out = compact_pred[0,:,:].copy()
             elif args.ulp_classifier:
-                outputs = net(data_bat, linear_classifier=False, ulp_classifier=True)
+                outputs, _ = net(data_bat, test_linear=False, test_lproto=False, test_ulproto=True)
                 compact_pred = torch.argmax(outputs, dim=1)
                 compact_pred = compact_pred.data.cpu().numpy()
                 out = compact_pred[0,:,:].copy()

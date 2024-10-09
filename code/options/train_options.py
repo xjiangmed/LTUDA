@@ -5,8 +5,10 @@ class TrainOptions():
     def initialize(self):
         parser = argparse.ArgumentParser(description="LTUDA")
         parser.add_argument('--model', type=str, default='unet_proto', help='model_name')
-        parser.add_argument("--train_path", type=str, default="../data/Toy dataset/train_slice.txt" )
-        parser.add_argument("--val_path", type=str, default="../data/Toy dataset/test_volume.txt")
+        parser.add_argument("--train_data_dir", type=str, default="../data/Toy_dataset/AbdomenCT-1K/slice_npz/")
+        parser.add_argument("--train_path", type=str, default="../data/Toy_dataset/train_slice.txt" )
+        parser.add_argument("--val_data_dir", type=str, default="../data/Toy_dataset/AbdomenCT-1K/npz_case/")
+        parser.add_argument("--val_path", type=str, default="../data/Toy_dataset/test_volume.txt")
         parser.add_argument('--save_model_path', type=str, default="./checkpoint/CDA_PDA")
         parser.add_argument("--reload_path", type=str, default='../checkpoint/CDA/model_best.pth')
         parser.add_argument("--input_size", type=str, default='256,256')

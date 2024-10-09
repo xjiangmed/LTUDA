@@ -8,7 +8,7 @@ Xixi Jiang, Dong Zhang, Xiang Li, Kangyi Liu, Kwang-Ting Cheng, Xin Yang
 
 ## Abstract
 <p align="justify">
-Partially-supervised multi-organ medical image segmentation aims to develop a unified semantic segmentation model by utilizing multiple partially-labeled datasets, with each dataset providing labels for a single class of organs. However, the limited availability of labeled foreground organs and the absence of supervision to distinguish unlabeled foreground organs from the background pose a significant challenge, which leads to a distribution mismatch between labeled and unlabeled pixels. Although existing pseudo-labeling methods can be employed to learn from both labeled and unlabeled pixels, they are prone to performance degradation in this task, as they rely on the assumption that labeled and unlabeled pixels have the same distribution. In this paper, to address the problem of distribution mismatch, we propose a labeled-to-unlabeled distribution alignment (LTUDA) framework that aligns feature distributions and enhances discriminative capability. Specifically, we introduce a cross-set data augmentation strategy, which performs region-level mixing between labeled and unlabeled organs to reduce distribution discrepancy and enrich the training set. Besides, we propose a prototype-based distribution alignment method that implicitly reduces intra-class variation and increases the separation between the unlabeled foreground and background. This can be achieved by encouraging consistency between the outputs of two prototype classifiers and a linear classifier. Extenvive experimental results on the AbdomenCT-1K dataset and a union of four benchmark datasets (including LiTS, MSD-Spleen, KiTS, and NIH82) demonstrate that our method outperforms the state-of-the-art partially-supervised methods by a considerable margin, and even surpasses the fully-supervised methods.
+Partially-supervised multi-organ medical image segmentation aims to develop a unified semantic segmentation model by utilizing multiple partially-labeled datasets, with each dataset providing labels for a single class of organs. However, the limited availability of labeled foreground organs and the absence of supervision to distinguish unlabeled foreground organs from the background pose a significant challenge, which leads to a distribution mismatch between labeled and unlabeled pixels. Although existing pseudo-labeling methods can be employed to learn from both labeled and unlabeled pixels, they are prone to performance degradation in this task, as they rely on the assumption that labeled and unlabeled pixels have the same distribution. In this paper, to address the problem of distribution mismatch, we propose a labeled-to-unlabeled distribution alignment (LTUDA) framework that aligns feature distributions and enhances discriminative capability. Specifically, we introduce a cross-set data augmentation strategy, which performs region-level mixing between labeled and unlabeled organs to reduce distribution discrepancy and enrich the training set. Besides, we propose a prototype-based distribution alignment method that implicitly reduces intra-class variation and increases the separation between the unlabeled foreground and background. This can be achieved by encouraging consistency between the outputs of two prototype classifiers and a linear classifier.Extensive experimental results on the AbdomenCT-1K dataset and a union of four benchmark datasets (including LiTS, MSD-Spleen, KiTS, and NIH82) demonstrate that our method outperforms the state-of-the-art partially-supervised methods by a considerable margin, and even surpasses the fully-supervised methods
 
 ## The overall architecture
 ![image](https://github.com/xjiangmed/LTUDA/blob/main/imgs/framework.png)
@@ -27,7 +27,7 @@ cd LTUDA
 ```
 - Install requirements:
 ```
-pip install -r requirements.txt
+bash env_setup.sh
 ```
 
 ## Usage
@@ -66,6 +66,7 @@ The models trained on Partially labeled dataset are available [here](https://dri
 ```
 python test.py --model unet_proto --reload_path '../checkpoint/CDA_PDA/ema_model_best.pth'
 ```
+When testing, you can choose linear classifier, labeled prototype classifier or unlabeled prototype classifier.
 
 ## Qualitative results
 TSNE feature visualization

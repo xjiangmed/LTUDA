@@ -74,7 +74,7 @@ def main():
         ema_model = ModelEMA(model1, 0.999)
         model_ema = ema_model.ema
 
-    train_data = ToyDataSet(args.train_path)
+    train_data = ToyDataSet(args.train_path, args.train_data_dir)
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     
     loss_seg_CE = loss.pBCE(num_classes=4).to(device)
@@ -220,7 +220,7 @@ def main():
             model_ema.eval()
             with torch.no_grad():
                 print('epoch:'+str(epoch))
-                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(test_model, args.val_path,test_linear=False)
+                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(test_model, args.val_path, args.val_data_dir, test_linear=False)
                 print('1K----student model prototype:'+str(dice_final_AbdomenCT_1K)+' L '+str(dice_organs_1K[0])+' S '+str(dice_organs_1K[1])+' K '+str(dice_organs_1K[2])+' P '+str(dice_organs_1K[3]))
                 writer.add_scalars('evaluation_dice_final', {'multi_AbdomenCT_1K':dice_final_AbdomenCT_1K}, epoch)
             
@@ -231,7 +231,7 @@ def main():
                     print("=> saved model")
 
 
-                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(model_ema, args.val_path,test_linear=False)
+                dice_final_AbdomenCT_1K, dice_organs_1K = case_validate_multi(model_ema, args.val_path, args.val_data_dir, test_linear=False)
                 print('1K----ema model:'+str(dice_final_AbdomenCT_1K)+' L '+str(dice_organs_1K[0])+' S '+str(dice_organs_1K[1])+' K '+str(dice_organs_1K[2])+' P '+str(dice_organs_1K[3]))
                 writer.add_scalars('evaluation_dice_ema', {'multi_AbdomenCT_1K':dice_final_AbdomenCT_1K}, epoch)
 
@@ -240,7 +240,6 @@ def main():
                     max_dice_ema = dice_final_AbdomenCT_1K
                     print("=> saved model")
                 print("best val dice:{0}".format(max_dice)) 
-        
         
     
 def read_lists(fid):
@@ -260,7 +259,7 @@ def get_prediction(outputs):
     out = compact_pred[0,:,:].copy()
     return out
 
-def case_validate_multi(model1, data_path, test_linear=True):
+def case_validate_multi(model1, data_path, data_dir, test_linear=True):
 
     test_list = read_lists(data_path)
     data_size = [1, 256, 256]
@@ -269,11 +268,8 @@ def case_validate_multi(model1, data_path, test_linear=True):
     dice_list={'L1':[],'S1':[],'K1':[],'P1':[],'L2':[],'S2':[],'K2':[],'P2':[],'L':[],'S':[],'K':[],'P':[]}
     organ_number = ['bg','liver','spleen','kidney','pancreas']
     for idx_file, fid in enumerate(test_list):
-        # print(idx_file, fid)
-        dataid = fid.split('/')[-1].split('.')[0][-3:]#.split('_')[1]
-        organ = fid.split('/')[-1].split('_')[0]
-
-        _npz_dict = np.load(fid)
+        file_path = os.path.join(data_dir, fid)
+        _npz_dict = np.load(file_path)
         data = _npz_dict['arr_0'].transpose(2,1,0)
         label = _npz_dict['arr_1'].transpose(2,1,0)
         tmp_pred_ens = np.zeros(label.shape)
@@ -295,11 +291,11 @@ def case_validate_multi(model1, data_path, test_linear=True):
             
             # linear classifier
             if test_linear:
-                outputs, _ = model1(data_bat)
+                outputs, _ = model1(data_bat, test_linear=True, test_lproto=False, test_ulproto=False)
                 out = get_prediction(outputs)
             else:
                 # proto classifier
-                outputs, fea = model1(data_bat, test_proto=True)
+                outputs, fea = model1(data_bat, test_linear=False, test_lproto=False, test_ulproto=True)
                 compact_pred = torch.argmax(outputs, dim=1)
                 compact_pred = compact_pred.data.cpu().numpy()
                 out = compact_pred[0,:,:].copy()
@@ -320,9 +316,7 @@ def case_validate_multi(model1, data_path, test_linear=True):
             if cls == 4:
                 
                 dice_list['P'].append(mmb.dc(tmp_pred_ens== int(cls), label == int(cls)))
-       
-            
-    
+        
     dice_organs = [np.mean(dice_list['L']), np.mean(dice_list['S']), np.mean(dice_list['K']),np.mean(dice_list['P'])]
     dice_final = np.mean(dice_organs)
     return  dice_final, dice_organs

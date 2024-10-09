@@ -177,7 +177,7 @@ class unet_proto(nn.Module):
 
         return proto_logits, proto_target
 
-    def forward(self, x, gt_seg=None, pseudo_seg=None, pretrain_prototype=False, use_prototype=False, test_linear=False, test_proto=False):
+    def forward(self, x, gt_seg=None, pseudo_seg=None, pretrain_prototype=False, use_prototype=False, test_linear=False, test_lproto=False, test_ulproto=False):
         x1 = self.inc(x)
         x2 = self.down1(x1)
         x3 = self.down2(x2)
@@ -194,7 +194,7 @@ class unet_proto(nn.Module):
             c = self.proj_head(x_out)
             return logits, c
 
-        if test_proto:
+        if test_lproto or test_ulproto:
             feats = x_out
 
             c = self.proj_head(feats)#use prototype for seg
@@ -203,16 +203,17 @@ class unet_proto(nn.Module):
             _c = l2_normalize(_c)
 
             # test unlabeled proto
-            self.prototypes_unlabeled.data.copy_(l2_normalize(self.prototypes_unlabeled))
+            if test_ulproto:
+                self.prototypes_unlabeled.data.copy_(l2_normalize(self.prototypes_unlabeled))
 
-            # n: h*w, k: num_class, m: num_prototype
-            masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_unlabeled)
+                # n: h*w, k: num_class, m: num_prototype
+                masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_unlabeled)
+            elif test_lproto:
+                # # test labeled proto
+                self.prototypes_labeled.data.copy_(l2_normalize(self.prototypes_labeled))
 
-            # # # test labeled proto
-            # self.prototypes_labeled.data.copy_(l2_normalize(self.prototypes_labeled))
-
-            # # n: h*w, k: num_class, m: num_prototype
-            # masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_labeled)
+                # n: h*w, k: num_class, m: num_prototype
+                masks = torch.einsum('nd,kmd->nmk', _c, self.prototypes_labeled)
 
             out_seg = torch.amax(masks, dim=1)
             out_seg = self.mask_norm(out_seg)
@@ -257,7 +258,7 @@ class unet_proto(nn.Module):
 
 
 def UNet_proto(input_channel = 1,num_class = 1,num_prototype=1):
-    print("Using Unet")
+    print("Using Unet_proto")
     model = unet_proto(input_channel,num_class,num_prototype)
     return model
 
